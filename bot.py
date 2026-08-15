@@ -2,9 +2,13 @@ import telebot
 from telebot import types
 
 from config import TOKEN
+from database import setup, add_user, add_message
 
 
 bot = telebot.TeleBot(TOKEN)
+
+
+setup()
 
 
 def menu():
@@ -29,6 +33,11 @@ def menu():
 @bot.message_handler(commands=["start"])
 def start(message):
 
+    add_user(
+        message.from_user.id,
+        message.from_user.username
+    )
+
     bot.send_message(
         message.chat.id,
         """
@@ -44,6 +53,10 @@ def start(message):
 
 @bot.message_handler(func=lambda message: True)
 def message_handler(message):
+
+    add_message(
+        message.from_user.id
+    )
 
     text = message.text
 
@@ -69,7 +82,8 @@ def message_handler(message):
 
         bot.send_message(
             message.chat.id,
-            "🛡 Модерация включена."
+            "🛡 Раздел модерации.\n"
+            "Защита групп и управление."
         )
 
 
@@ -77,7 +91,8 @@ def message_handler(message):
 
         bot.send_message(
             message.chat.id,
-            "💰 Магазин услуг PulSar."
+            "💰 Магазин PulSar.\n"
+            "Услуги и предложения."
         )
 
 
@@ -90,5 +105,6 @@ def message_handler(message):
 
 
 print("🚀 PulSar AI Assistant запущен")
+
 
 bot.infinity_polling()
