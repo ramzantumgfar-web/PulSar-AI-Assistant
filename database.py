@@ -1,80 +1,20 @@
-import sqlite3
-
-
-DB = "database.db"
-
-
-def connect():
-    return sqlite3.connect(DB)
-
-
-def setup():
-
-    db = connect()
-    cursor = db.cursor()
-
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY,
-        username TEXT,
-        messages INTEGER DEFAULT 0
-    )
-    """)
-
-    db.commit()
-    db.close()
-
-
-def add_user(user_id, username):
-
-    db = connect()
-    cursor = db.cursor()
-
+def add_balance(user_id, amount):
     cursor.execute(
-        """
-        INSERT OR IGNORE INTO users
-        (id, username)
-        VALUES (?, ?)
-        """,
-        (
-            user_id,
-            username
-        )
+        "UPDATE users SET balance = balance + ? WHERE id = ?",
+        (amount, user_id)
     )
-
-    db.commit()
-    db.close()
+    conn.commit()
 
 
-def add_message(user_id):
-
-    db = connect()
-    cursor = db.cursor()
-
+def get_balance(user_id):
     cursor.execute(
-        """
-        UPDATE users
-        SET messages = messages + 1
-        WHERE id = ?
-        """,
+        "SELECT balance FROM users WHERE id = ?",
         (user_id,)
     )
 
-    db.commit()
-    db.close()
+    result = cursor.fetchone()
 
+    if result:
+        return result[0]
 
-def users_count():
-
-    db = connect()
-    cursor = db.cursor()
-
-    cursor.execute(
-        "SELECT COUNT(*) FROM users"
-    )
-
-    count = cursor.fetchone()[0]
-
-    db.close()
-
-    return count
+    return 0
